@@ -1,0 +1,228 @@
+﻿@model StrikzzPOS.DTO.OrderDTO
+
+@{
+    ViewBag.Title = "OrderDetail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+    $("#btnCancelOrder").click(function () {
+        ConfirmDialog();
+    });
+    function ConfirmDialog() {
+        $('<div></div>').appendTo('body')
+            .html('<div><h6>' + "Do you want to Cancel the Receipt " + '?</h6></div>')
+            .dialog({
+                modal: true,
+                title: 'Delete message',
+                zIndex: 10000,
+                autoOpen: true,
+                width: 'auto',
+                resizable: false,
+                buttons: {
+                    Yes: function () {
+                        // $(obj).removeAttr('onclick');
+                        // $(obj).parents('.Parent').remove();
+
+                        $('body').append('<h1>Confirm Dialog Result: <i>Yes</i></h1>');
+
+                        $(this).dialog("close");
+                    },
+                    No: function () {
+                        $('body').append('<h1>Confirm Dialog Result: <i>No</i></h1>');
+
+                        $(this).dialog("close");
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            });
+    };
+
+    $(document).ready(function () {
+        $("#btnCancelOrder").click(function (e) {
+            // use whatever confirm box you want here
+            if (!window.confirm("Are you sure?")) {
+                e.preventDefault();
+            }
+            else {
+                var orderId = $("#OrderId").val();
+                var Order = new Object();
+                Order.OrderId = $("#OrderId").val();
+                $.ajax({
+                    async: false,
+                    type: 'POST',
+                    dataType: 'JSON',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(Order),
+                    url: '/PurchaseSystem/Order/CancelOrder',
+                    success: function (data) {
+                        if (data.status === 'OK') {
+                            window.location.href = data.Url
+                        }
+                        else {
+                            alert("Error Cancelling Order");
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+@using (Html.BeginForm("OrderDetail", "Order"))
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <div style="text-align:center">
+        <h3>Receipt Details</h3>
+    </div>
+    <hr />
+    <input type="hidden" value=@Model.OrderId id="OrderId" />
+    <div class="row">
+        <div class="col-md-6">
+            <strong>
+                Receipt# :
+            </strong>
+            @Html.DisplayFor(a => a.OrderNumber)
+        </div>
+        <div class="col-md-6">
+            <strong>
+                Customer Name :
+            </strong>
+            @Html.DisplayFor(a => a.CustomerName)
+        </div>
+    </div>
+    <div class="row">
+        <br />
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <strong>
+                Receipt Date :
+            </strong>
+            @Html.DisplayFor(a => a.OrderDate)
+        </div>
+        <div class="col-md-6">
+            <strong>
+                Final Total :
+            </strong>
+            @Html.DisplayFor(a => a.FinalTotal)
+        </div>
+
+    </div>
+    <div class="row">
+        <br />
+    </div>
+
+    <div class="row">
+        @{
+
+            if (Model.OrderStatus == "A")
+            {
+                <div class="col-md-6">
+                    <strong>
+                        Receipt Status :
+                    </strong>
+                    Active
+                </div>
+            }
+            else if (Model.OrderStatus == "C")
+            {
+                <div class="col-md-6">
+                    <strong>
+                        Order Status :
+                    </strong>
+                    Cancelled
+                </div>
+            }
+        }
+        @{
+
+            if (Model.OrderStatus == "C")
+            {
+                <div class="col-md-6">
+                    <strong>
+                        Order Cancel Date :
+                    </strong>
+                    @Html.DisplayFor(a => a.OrderCancelDate)
+                </div>
+            }
+
+        }
+    </div>
+    <div class="row">
+        <br />
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-condensed" id="tblOrderDetails">
+                <thead>
+                    <tr>
+                        <th>
+                            Product Name
+                        </th>
+                        <th>
+                            Unite Price
+                        </th>
+                        <th>
+                            Quantity
+                        </th>
+                        <th>
+                            Discount
+                        </th>
+                        <th>
+                            Total
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <tr>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UnitPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Quantity)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Discount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Total)
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    @Html.HiddenFor(a => a.OrderId)
+    <div class="row">
+        <div class="col-md-5">
+            @Html.ActionLink("Back to List", "OrderList")
+        </div>
+        @{
+            if (Model.OrderStatus == "A")
+            {
+                <div class="col-md-7">
+                    <input type="button" id="btnCancelOrder" value="Cancel" class="btn btn-danger" />
+                </div>
+            }
+        }
+
+    </div>
+
+</div>
+}
+

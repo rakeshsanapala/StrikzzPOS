@@ -1,0 +1,40 @@
+﻿@model Microsoft.AspNet.Identity.EntityFramework.IdentityRole
+@*@{
+    ViewBag.Title = "CreateRole";
+}
+<h2>Create Role</h2>
+@using (Html.BeginForm("CreateRole", "Role"))
+{
+    <div class="form-group">
+        @Html.LabelFor(a => a.Name)
+        @Html.TextBoxFor(a => a.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(a => a.Name)
+    </div>
+    <input type="submit" value="Save" class="btn btn-primary" />
+}*@
+@Html.ActionLink("Role List", "RoleList", "Role")
+@{
+    ViewBag.Title = "CreateUpdateRole";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Add/Update Role</h2>
+@using (Html.BeginForm("CreateUpdateRole", "Role"))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(a => a.Name, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(a => a.Name, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+        @Html.HiddenFor(a => a.Id)
+        <div class="form-control-static">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+}
+

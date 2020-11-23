@@ -1,0 +1,63 @@
+﻿@model  List<StrikzzPOS.Models.ApplicationUser>
+
+@{
+    /**/
+
+    ViewBag.Title = "UsersList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="text-align:center">
+    <h1>Users</h1>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#products').DataTable({
+            });
+
+        });
+    </script>
+}
+@Html.AntiForgeryToken()
+<p>
+    @Html.ActionLink("Create New", "AddUpdateUser", "Account", null, new { @class = "btn btn-primary btn-sm" })
+</p>
+<table id="products" class="table">
+    <thead>
+        <tr>
+            <th>
+                Username
+            </th>
+            <th>
+                Email
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(a => a.UserName))
+        {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "ResetPassword","Account", new { id = item.Email },null) |
+
+                @Html.ActionLink("Delete", "DeleteUser","Account", new { id = item.Email },null)
+            </td>
+        </tr>
+
+        }
+    </tbody>
+</table>
+
+
+

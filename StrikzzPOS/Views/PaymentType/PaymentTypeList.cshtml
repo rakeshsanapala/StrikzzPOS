@@ -1,0 +1,63 @@
+﻿@model IEnumerable<StrikzzPOS.Common.PaymentTypes>
+
+
+@{
+    /**/
+
+    ViewBag.Title = "PaymentTypeList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="text-align:center">
+    <h1>Payment Types</h1>
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#products').DataTable({
+            });
+
+        });
+    </script>
+}
+@Html.AntiForgeryToken()
+<p>
+    @Html.ActionLink("Create New", "AddUpdatePaymentType", "PaymentType", null, new { @class = "btn btn-primary btn-sm" })
+
+</p>
+<table id="products" class="table">
+    <thead>
+        <tr>
+            <th>
+                Payment Type
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(a => a.PaymentType))
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.PaymentType)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.pk_PaymentTypeId }) |
+
+                    @Html.ActionLink("Delete", "Delete", new { id = item.pk_PaymentTypeId })
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+
+
+
+

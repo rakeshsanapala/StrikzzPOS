@@ -1,0 +1,103 @@
+﻿<ul class="nav navbar-nav">
+
+    @*<li>@Html.ActionLink("Home", "DisplayModule", "UserHome")</li>*@
+
+    @*<li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                Admin Master Data <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+                <li>@Html.ActionLink("Product Master", "ProductList", "Product")</li>
+                <li>@Html.ActionLink("Module Master", "ModuleList", "Module")</li>
+                <li>@Html.ActionLink("Create / Select Customer", "CustomerList", "Customer")</li>
+            </ul>
+        </li>*@
+    <li>@Html.ActionLink("Sale", "SaveUpdateBill", "ComBill")</li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+            Products <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+            <li>@Html.ActionLink("Products", "ProductList", "Product")</li>
+            <li>@Html.ActionLink("Product Types", "ProductTypeList", "ProductType")</li>
+        </ul>
+    </li>
+    @{
+        if (User.IsInRole("Admin"))
+        {
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                    Admin <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>@Html.ActionLink("Users", "Users", "Account")</li>
+                    <li>@Html.ActionLink("Roles", "RoleList", "Role")</li>
+                    <li>@Html.ActionLink("Payment Types", "PaymentTypeList", "PaymentType")</li>
+                    <li>@Html.ActionLink("Receipts", "OrderList", "Order")</li>
+                </ul>
+            </li>
+        }
+    }
+
+    @*<ul class="nav navbar-nav">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                    Settings <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>@Html.ActionLink("Product Master", "ProductList", "Product")</li>
+                    <li>@Html.ActionLink("Module Master", "ModuleList", "Module")</li>
+                    <li>@Html.ActionLink("Create / Select Customer", "CustomerList", "Customer")</li>
+                </ul>
+            </li>
+        </ul>*@
+
+</ul>
+@*<body>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                </div>
+
+                <div class="navbar-collapse collapse" id=".navbar-collapse">
+                    <a class="navbar-brand">
+                        <img src="~/Images/StrikzzLogoTransparent.png" alt="Strikzz" height="45" width="45">
+                    </a>
+                    <ul class="nav navbar-nav">
+                        <li><a href="#">Sale</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("Products", "ProductList", "Product")</li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("Customers", "CustomerList", "Customer")</li>
+                    </ul>
+                    <ul class="nav navbar-nav">
+                        <li><a href="#">Users</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Settings <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>@Html.ActionLink("Product Master", "ProductList", "Product")</li>
+                                <li>@Html.ActionLink("Module Master", "ModuleList", "Module")</li>
+                                <li>@Html.ActionLink("Create / Select Customer", "CustomerList", "Customer")</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </body>*@

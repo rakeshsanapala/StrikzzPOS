@@ -1,0 +1,75 @@
+﻿@model IEnumerable<StrikzzPOS.Common.CustomerMst>
+@{
+    ViewBag.Title = "CustomerList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div style="text-align:center">
+    <h1>Customers</h1>
+</div>
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#products').DataTable({
+            });
+
+        });
+    </script>
+}
+
+@Html.AntiForgeryToken()
+
+<p>
+    @Html.ActionLink("Create New", "SaveUpdateCustomer", "Customer", null, new { @class = "btn btn-primary btn-sm" })
+</p>
+<table id="products" class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Mobile No
+            </th>
+            <th>
+                Last Visit
+            </th>
+            <th>
+                First Visit
+            </th>
+            <th>
+                Total Spent
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(a => a.LastVisit))
+        {
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MobNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastVisit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstVisit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalSpent)
+                </td>
+                <td>
+                    @Html.ActionLink("Select", "SaveUpdateBill", "ComBill", new { id = item.pk_Custid }, new { @class = "btn btn-primary btn-sm" })
+                    @Html.ActionLink("Edit", "Edit", new { id = item.pk_Custid }) |
+
+                    @Html.ActionLink("Delete", "Delete", new { id = item.pk_Custid })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

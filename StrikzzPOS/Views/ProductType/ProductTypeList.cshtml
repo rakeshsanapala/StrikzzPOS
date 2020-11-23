@@ -1,0 +1,63 @@
+﻿@model IEnumerable<StrikzzPOS.Common.ProductTypeMst>
+
+
+@{
+    /**/
+
+    ViewBag.Title = "ProductTypeList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="text-align:center">
+    <h1>Product Types</h1>
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#products').DataTable({
+            });
+
+        });
+    </script>
+}
+@Html.AntiForgeryToken()
+<p>
+    @Html.ActionLink("Create New", "Create", "ProductType", null, new { @class = "btn btn-primary btn-sm" })
+
+</p>
+<table id="products" class="table">
+    <thead>
+        <tr>
+            <th>
+                Product Type
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(a => a.Description))
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.pk_prodtypeid }) |
+
+                    @Html.ActionLink("Delete", "Delete", new { id = item.pk_prodtypeid })
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+
+
+
+

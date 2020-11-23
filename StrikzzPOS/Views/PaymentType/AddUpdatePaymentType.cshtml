@@ -1,0 +1,27 @@
+﻿@model StrikzzPOS.Common.PaymentTypes
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Create / Update</h2>
+@using (Html.BeginForm("AddUpdatePaymentType", "PaymentType"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(a => a.PaymentType, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(a => a.PaymentType, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+        @Html.HiddenFor(a => a.pk_PaymentTypeId)
+        <div class="form-control-static">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+}
+
