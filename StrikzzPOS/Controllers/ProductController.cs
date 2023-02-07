@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace StrikzzPOS.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         ApplicationDbContext _db = new ApplicationDbContext();
@@ -73,7 +73,6 @@ namespace StrikzzPOS.Controllers
             return RedirectToAction("ProductList");
 
         }
-
 
         [HttpPost]
         public ActionResult AddUpdateProduct(ProductMstDTO product)

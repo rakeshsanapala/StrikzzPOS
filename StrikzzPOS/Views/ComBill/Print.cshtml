@@ -7,6 +7,51 @@
 
 
 <script type="text/javascript">
+
+    function PrintElem(elem) {
+        var mywindow = window.open('', 'PRINT', 'height=200,width=100');
+
+        mywindow.document.write('<html><head><title>' + document.title + '</title>');
+        mywindow.document.write('</head><body >');
+        mywindow.document.write('<h1>' + document.title + '</h1>');
+        mywindow.document.write(document.getElementById(elem).innerHTML);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+    }
+    function printDiv(divID) {
+        //Get the HTML of div
+        var divElements = document.getElementById(divID).innerHTML;
+        //Get the HTML of whole page
+        var mywindow = window.open('', 'PRINT', 'height=800,width=400');
+
+        mywindow.document.write('<html><head><title></title>');
+        mywindow.document.write('</head><body >');
+        mywindow.document.write('<h1>' + 'Strikzz' + '</h1>');
+        mywindow.document.write(divElements);
+        mywindow.document.write('</body></html>');
+        //Print Page
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        //Restore orignal HTML
+        document.body.innerHTML = oldPage;
+
+        return true;
+
+
+
+
+    }
     $(document).ready(function () {
 
         //Quantity button script
@@ -57,7 +102,7 @@
         });
         //
 
-        $("#btnCheckOut").click(function () {
+        $("#btnPayment").click(function () {
             PlaceOrder();
         });
 
@@ -73,13 +118,11 @@
 
             if (this.value.length == 10) {
                 $("#txtName").val("");
-                debugger;
                 GetCustomerByPhone(this.value)
             }
 
         });
-
-    });
+  });
 
     function AddToTheItemList() {
         var tblItemList = $("#tblSaleList");
@@ -146,7 +189,7 @@
             dataType: 'JSON',
             contentType: 'application/json; charset=utf-8',
             data: { itemId: itemId },
-            url: '/StrikzzPOS/ComBill/getItemUnitPrice',
+            url: '@Url.Action("getItemUnitPrice","ComBill")',
             success: function (data) {
                 $("#txtUnitPrice").val(parseFloat(data["sellingUpToPrice"]).toFixed(2));
                 $("#selectedProductName").val(data["ProductName"]);
@@ -168,16 +211,15 @@
             dataType: 'JSON',
             contentType: 'application/json; charset=utf-8',
             data: { phoneNumber: phoneNumber },
-            url: '/StrikzzPOS/ComBill/GetCustomerByPhone',
+            url: '@Url.Action("GetCustomerByPhone", "ComBill")',
+            //url: '/PurchaseSystem/ComBill/GetCustomerByPhone',
             success: function (data) {
                 $("#txtName").val(data["Name"]);
-                $("#hiddenCustomerId").val(data["pk_Custid"]);
-                
 
             },
-            //error: function () {
-            //    alert("Error Finding Customer.")
-            //}
+            error: function () {
+                alert("Error Finding Customer.")
+            }
         });
         CalculateSubTotal();
 
@@ -208,20 +250,20 @@
         $("#txtBalance").val(parseFloat(BalanceAmount).toFixed(2));
 
         if ($("#txtPaymentAmount").val() != "" && parseFloat($("#txtPaymentAmount").val()) != 0 && $("#Fk_PaymentTypeId").val() != "") {
-            $("#btnCheckOut").removeAttr("disabled");
+            $("#btnPayment").removeAttr("disabled");
 
         } else {
-            $("#btnCheckOut").attr("disabled", "disabled");
+            $("#btnPayment").attr("disabled", "disabled");
         }
     }
 
     function PaymentTypeChange() {
 
         if ($("#txtPaymentAmount").val() != "" && parseFloat($("#txtPaymentAmount").val()) != 0 && $("#Fk_PaymentTypeId").val() != "") {
-            $("#btnCheckOut").removeAttr("disabled");
+            $("#btnPayment").removeAttr("disabled");
 
         } else {
-            $("#btnCheckOut").attr("disabled", "disabled");
+            $("#btnPayment").attr("disabled", "disabled");
         }
 
     }
@@ -230,7 +272,7 @@
         var objOrderViewModel = {};
         var ListOfOrderDetailsModel = new Array();
         objOrderViewModel.FK_PaymentTypeId = $("#Fk_PaymentTypeId").val();
-        objOrderViewModel.FK_CustomerId = $("#hiddenCustomerId").val();
+        objOrderViewModel.FK_CustomerId = $("#customerId").val();
         objOrderViewModel.FinalTotal = $("#txtPaymentTotal").val();
 
         $("tr:gt(1)").each(function () {
@@ -252,12 +294,11 @@
             async: false,
             type: 'POST',
             dataType: 'JSON',
-            async: true,
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(objOrderViewModel),
-            url: '/StrikzzPOS/ComBill/Order',
+            url: '@Url.Action("Order", "ComBill")',
+            //url: '/PurchaseSystem/ComBill/Order',
             success: function (response) {
-                debugger;
                 window.location = response.url;
             },
             error: function () {
@@ -309,12 +350,12 @@
     }
 </style>
 
-@using (Html.BeginForm("SaveUpdateBill", "ComBill", FormMethod.Post))
+@using (Html.BeginForm("SaveUpdateBill", "ComBill"))
 {
     @Html.AntiForgeryToken()
 
     <fieldset>
-        <input type="hidden" value="hiddenCustomerId" id="hiddenCustomerId" />
+        <input type="hidden" value=@Model.CustomerMst.pk_Custid id="customerId" />
         <div class="row">
             <br />
         </div>
@@ -426,7 +467,7 @@
     </fieldset>
     <fieldset>
         <legend> Current Sale</legend>
-        <div class="row">
+        <div id="printablediv" class="row">
             <div class="col-md-12">
                 <table class="table table-condensed" id="tblSaleList">
                     <thead>
@@ -450,7 +491,6 @@
                                 Total
                             </th>
                             <th>
-
                             </th>
                         </tr>
                     </thead>
@@ -459,44 +499,12 @@
         </div>
     </fieldset>
 
-    <fieldset>
-        <legend></legend>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-2">
-                    <div class="form-group">
-                        Final Total
-                        <input style="text-align: right" type="text" id="txtPaymentTotal" readonly="readonly" value="0.00" class="form-control" />
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        Payment Amount
-                        <input style="text-align: right" type="text" id="txtPaymentAmount" value="0.00" class="form-control" />
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        Return Amount
-                        <input style="text-align: right" type="text" readonly="readonly" id="txtBalance" value="0.00" class="form-control" />
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        Payment Type
-                        @Html.DropDownListFor(model => model.Fk_PaymentTypeId, new SelectList(Model.PaymentTypes, "pk_PaymentTypeId", "PaymentType"),
-                                       "", new { @class = "form-control", onchange = "PaymentTypeChange()" })
-                    </div>
-                </div>
-            </div>
-           
-        </div>
-    </fieldset>
     <div style="margin-top:10px">
-        <input  type="button" value="Checkout" name="checkout" id="btnCheckOut" class="btn btn-primary" />
+        <input type="button" value="Print this page" onclick="window.print()">
+        <input data-backdrop="static" data-keydrop="false" data-toggle="modal" data-target="#divPayment" style="float:right" type="button" value="Checkout" name="checkout" id="btnCheckOut" class="btn btn-primary" />
     </div>
 
-    @*<div id="divPayment" class="modal fade" role="dialog">
+    <div id="divPayment" class="modal fade" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -540,10 +548,19 @@
 
             </div>
         </div>
-    </div>*@
-    @*<input id="Button1" type="button" value="Open Dialog" />
-        <div id="dialogdiv">
-            <input id="Text1" type="text" /><br />
-            <input id="Button1" type="button" value="button" />
+    </div>
+    @*<div id="printablediv" style="width: 50px; background-color: none; height: 200px">
+
+            <tr>
+                <td class="invoiceFooterTitle">@Resources.Print.Invoice_SubTotal:</td>
+                <td>@Model.InvoiceDetails.Sum(i => i.Qty)</td>
+                <td>-</td>
+                <td>@String.Format("{0:C}", Model.NetTotal)</td>
+                <td>@String.Format("{0:C}", Model.VATAmount)</td>
+                <td>@String.Format("{0:C}", Model.TotalWithVAT)</td>
+
+            </tr>
         </div>*@
+
+    <input type="button" value="Print 1st Div" onclick="javascript:printDiv('printablediv')" />
 }

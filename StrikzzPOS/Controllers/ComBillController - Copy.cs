@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
-using StrikzzPOS.Common;
+﻿using StrikzzPOS.Common;
 using StrikzzPOS.DTO;
 using StrikzzPOS.Models;
 using System;
@@ -12,17 +11,17 @@ using System.Web.Mvc;
 namespace StrikzzPOS.Controllers
 {
     [Authorize]
-    public class ComBillController : Controller
+    public class ComBillController_copy : Controller
     {
         ApplicationDbContext _db;
 
-        public ComBillController()
+        public ComBillController_copy()
         {
             _db = new ApplicationDbContext();
         }
 
         [ChildActionOnly]
-      //  [OutputCache(CacheProfile = "Cache10Min")]
+        [OutputCache(CacheProfile = "Cache10Min")]
         public Com_Bill_DTO GetPageData()
         {
             Com_Bill_DTO comBill = new Com_Bill_DTO();
@@ -31,19 +30,19 @@ namespace StrikzzPOS.Controllers
             var products = Session["PRODUCTMSTS"];
             //var paymentTypesList = new List<PaymentTypes>();
             if (products != null)
-            {
                 ProductList = (IEnumerable<ProductListDTO>)products;
-                if(!ProductList.Any())
-                {
-                    ProductList = GetUserProducts();
-                }
-            }    
             else
             {
-                ProductList = GetUserProducts();
+                ProductList = from a in _db.ProductMsts
+                              join b in _db.ProductTypeMsts on a.fk_prodtypeid equals b.pk_prodtypeid
+                              select new ProductListDTO
+                              {
+                                  pk_ProductId = a.pk_ProductId,
+                                  ProductName = a.ProductName,
+                                  productTypeId = a.fk_prodtypeid,
+                              };
                 Session["PRODUCTMSTS"] = ProductList;
             }
-
             var prodList = from productList in ProductList
                            select new ProductDDD_DTO
                            {
@@ -60,31 +59,12 @@ namespace StrikzzPOS.Controllers
             return comBill;
         }
 
-        private IEnumerable<ProductListDTO> GetUserProducts()
-        {
-            IEnumerable<ProductListDTO> ProductList;
-            var userid = User.Identity.GetUserId().ToString();
-            ProductList = from a in _db.ProductMsts
-                          join b in _db.ProductTypeMsts on a.fk_prodtypeid equals b.pk_prodtypeid
-                          join c in _db.UserProducts on a.pk_ProductId equals c.fk_productId
-                          where c.fk_UserId == userid
-                          select new ProductListDTO
-                          {
-                              pk_ProductId = a.pk_ProductId,
-                              ProductName = a.ProductName,
-                              productTypeId = a.fk_prodtypeid
-                          };
-            return ProductList;
-        }
 
 
         [HttpGet]
         public JsonResult GetCustomerByPhone(string phoneNumber)
-            {
+        {
             CustomerMst customer = _db.CustomerMsts.Where(a => a.MobNo == phoneNumber).OrderByDescending(a=>a.LastVisit).FirstOrDefault();
-
-           if (customer != null)
-            ViewBag.CustomerId = customer.pk_Custid;
 
             return Json(customer, JsonRequestBehavior.AllowGet);
         }
@@ -151,14 +131,10 @@ namespace StrikzzPOS.Controllers
         public JsonResult Order(Order objOrder)
         {
             Order order = new Order();
-            if(objOrder.FK_CustomerId==0)
-            {
-
-            }
             order.FK_CustomerId = objOrder.FK_CustomerId;
             order.FinalTotal = objOrder.FinalTotal;
             order.OrderDate = DateTime.Now;
-            order.OrderNumber = GetOrderNumber();
+            order.OrderNumber = String.Format("{0:ddMMyyyyhhmmss}", DateTime.Now);
             order.FK_PaymentTypeId = objOrder.FK_PaymentTypeId;
             order.OrderStatus = "A";
             _db.Order.Add(order);
@@ -177,31 +153,9 @@ namespace StrikzzPOS.Controllers
                 _db.OrderDetail.Add(orderDetail);
                 _db.SaveChanges();
             }
-            //return Json(new { response = "Redirect", url = Url.Action("OrderList", "Order") });
-            return Json(new { response = "Redirect", url = Url.Action("PrintBill", "Bill", new { id = order.OrderId }) });
-            // return Json(new { response = "Redirect", url = Url.Action("PrintBill", "Bill", new { orderId = order.OrderId, customerId = order.FK_CustomerId }) });
-
-        }
-        protected string GetOrderNumber()
-        {
-            string numbers = "1234567890";
-            string characters = numbers;
-            int length = 6;
-            string id = string.Empty;
-            for (int i = 0; i < length; i++)
-            {
-                string character = string.Empty;
-                do
-                {
-                    int index = new Random().Next(0, characters.Length);
-                    character = characters.ToCharArray()[index].ToString();
-                } while (id.IndexOf(character) != -1);
-                id += character;
-            }
-            return "G" + id;
+            return Json(new { response = "Redirect", url = Url.Action("OrderList", "Order") });
         }
 
-
-    }
+     }
 
 }

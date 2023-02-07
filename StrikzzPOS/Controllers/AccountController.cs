@@ -1,10 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+//using System.Web.Http;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using StrikzzPOS.Common;
 using StrikzzPOS.Models;
 
 namespace StrikzzPOS.Controllers
@@ -19,7 +23,7 @@ namespace StrikzzPOS.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -31,9 +35,9 @@ namespace StrikzzPOS.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -130,7 +134,7 @@ namespace StrikzzPOS.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -153,36 +157,36 @@ namespace StrikzzPOS.Controllers
         //    return View();
         //}
 
-       // //
-       // // POST: /Account/Register
-       // [HttpPost]
-       //// [AllowAnonymous]
-       // [ValidateAntiForgeryToken]
-       // public async Task<ActionResult> Register(RegisterViewModel model)
-       // {
-       //     if (ModelState.IsValid)
-       //     {
-       //         var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-       //         var result = await UserManager.CreateAsync(user, model.Password);
-       //         if (result.Succeeded)
-       //         {
-       //             await UserManager.AddToRoleAsync(user.Id, model.Name);
-       //             await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-       //             // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-       //             // Send an email with this link
-       //             // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-       //             // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-       //             // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+        // //
+        // // POST: /Account/Register
+        // [HttpPost]
+        //// [AllowAnonymous]
+        // [ValidateAntiForgeryToken]
+        // public async Task<ActionResult> Register(RegisterViewModel model)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+        //         var result = await UserManager.CreateAsync(user, model.Password);
+        //         if (result.Succeeded)
+        //         {
+        //             await UserManager.AddToRoleAsync(user.Id, model.Name);
+        //             await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
 
-       //             return RedirectToAction("Index", "Home");
-       //         }
-       //         AddErrors(result);
-       //     }
+        //             // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
+        //             // Send an email with this link
+        //             // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+        //             // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+        //             // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-       //     // If we got this far, something failed, redisplay form
-       //     return View(model);
-       // }
+        //             return RedirectToAction("Index", "Home");
+        //         }
+        //         AddErrors(result);
+        //     }
+
+        //     // If we got this far, something failed, redisplay form
+        //     return View(model);
+        // }
 
         //
         // GET: /Account/ConfirmEmail
@@ -247,10 +251,13 @@ namespace StrikzzPOS.Controllers
         public ActionResult AddUpdateUser()
         {
             ViewBag.Name = new SelectList(_db.Roles.ToList(), "Name", "Name");
-            return View("AddUpdateUser");
+
+            RegisterViewModel model = new RegisterViewModel();
+
+            //   model.drpProducts = _db.ProductMsts.Select(x => nb  yhn  n Text = x.ProductName, Value = x.pk_ProductId.ToString() }).ToList();
+            return View();
         }
 
-        //
         // POST: /Account/Register
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -261,22 +268,42 @@ namespace StrikzzPOS.Controllers
             {
                 ViewBag.Name = new SelectList(_db.Roles.ToList(), "Name", "Name");
 
+              //  if(model.)
                 ApplicationUser dbUser = UserManager.FindByName(model.Email.ToString());
-                
-                if(dbUser==null)
+
+                if (dbUser == null)
                 {
                     var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                     var result = await UserManager.CreateAsync(user, model.Password);
                     if (result.Succeeded)
                     {
                         await UserManager.AddToRoleAsync(user.Id, model.Name);
-                        // await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        try
+                        {
+                            var productNames = model.ProductNames.Split(',');
+                            var products = _db.ProductMsts.ToList();
 
-                        // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                        // Send an email with this link
-                        // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                            foreach (var productName in productNames)
+                            {
+                                var productId = products.Where(a => a.ProductName == productName).FirstOrDefault().pk_ProductId;
+                                var userProduct = new UserProduct
+                                {
+                                    fk_UserId = user.Id,
+                                    fk_productId = productId
+
+                                };
+                                _db.UserProducts.Add(userProduct);
+                                _db.SaveChanges();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            //if products adding code fails remove the user so that you can add again.
+                            await UserManager.RemoveFromRoleAsync(user.Id, model.Name);
+                            await UserManager.DeleteAsync(user);
+                            ModelState.AddModelError("", "Error Creating User :" + ex.Message);
+                        }
+
 
                         return RedirectToAction("Users");
                     }
@@ -284,15 +311,94 @@ namespace StrikzzPOS.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("","User Already Exists !");
+                    ModelState.AddModelError("", "User Already Exists !");
                 }
-               
-                
+
+
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public ActionResult EditUser(string email)
+        {
+            if (ModelState.IsValid)
+            {
+               ApplicationUser dbUser = UserManager.FindByName(email);
+                var registerViewModel = new RegisterViewModel();
+                registerViewModel.Email = dbUser.Email;
+                registerViewModel.Name = dbUser.UserName;
+
+                var userProducts = _db.UserProducts.Where(a => a.fk_UserId == dbUser.Id);
+            }
+
+           
+
+            return View();
+        }
+
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> EditUser(RegisterViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+
+        //        ApplicationUser dbUser = UserManager.FindByName(email);
+
+        //        if (dbUser == null)
+        //        {
+        //            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+        //            var result = await UserManager.CreateAsync(user, model.Password);
+        //            if (result.Succeeded)
+        //            {
+        //                await UserManager.AddToRoleAsync(user.Id, model.Name);
+        //                try
+        //                {
+        //                    var productNames = model.ProductNames.Split(',');
+        //                    var products = _db.ProductMsts.ToList();
+
+        //                    foreach (var productName in productNames)
+        //                    {
+        //                        var productId = products.Where(a => a.ProductName == productName).FirstOrDefault().pk_ProductId;
+        //                        var userProduct = new UserProduct
+        //                        {
+        //                            fk_UserId = user.Id,
+        //                            fk_productId = productId
+
+        //                        };
+        //                        _db.UserProducts.Add(userProduct);
+        //                        _db.SaveChanges();
+        //                    }
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    //if products adding code fails remove the user so that you can add again.
+        //                    await UserManager.RemoveFromRoleAsync(user.Id, model.Name);
+        //                    await UserManager.DeleteAsync(user);
+        //                    ModelState.AddModelError("", "Error Creating User :" + ex.Message);
+        //                }
+
+
+        //                return RedirectToAction("Users");
+        //            }
+        //            AddErrors(result);
+        //        }
+        //        else
+        //        {
+        //            ModelState.AddModelError("", "User Already Exists !");
+        //        }
+
+
+        //    }
+
+        //    // If we got this far, something failed, redisplay form
+        //    return View(model);
+        //}
 
         //
         // GET: /Account/ResetPassword
@@ -305,7 +411,7 @@ namespace StrikzzPOS.Controllers
         //
         // POST: /Account/ResetPassword
         [HttpPost]
-      //  [AllowAnonymous]
+        //  [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {

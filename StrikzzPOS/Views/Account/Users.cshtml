@@ -49,7 +49,7 @@
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
             <td>
-                @Html.ActionLink("Edit", "ResetPassword","Account", new { id = item.Email },null) |
+                @Html.ActionLink("Edit", "AddUpdateUser","Account", new { email = item.Email },null) |
 
                 @Html.ActionLink("Delete", "DeleteUser","Account", new { id = item.Email },null)
             </td>

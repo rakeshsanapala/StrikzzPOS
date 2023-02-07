@@ -22,20 +22,21 @@
     <script>
         $(document).ready(function () {
             $('#products').DataTable({
-                "order": [[1, "desc"]]
+                "order": [[1, "desc"]],
+                "columnDefs": [{ "targets": 1, "type": "date" }],
             });
 
         });
-        $(function () {
-            $('input[name="datetimes"]').daterangepicker({
-                timePicker: true,
-                startDate: moment().startOf('hour'),
-                endDate: moment().startOf('hour').add(32, 'hour'),
-                locale: {
-                    format: 'M/DD/YY hh:mm A'
-                }
-            });
-        });
+        //$(function () {
+        //    $('input[name="datetimes"]').daterangepicker({
+        //        timePicker: true,
+        //        startDate: moment().startOf('hour'),
+        //        endDate: moment().startOf('hour').add(32, 'hour'),
+        //        locale: {
+        //            format: 'M/DD/YY hh:mm A'
+        //        }
+        //    });
+        //});
     </script>
 }
 @Html.AntiForgeryToken()
@@ -44,7 +45,7 @@
 {
     @Html.AntiForgeryToken()
 
-    <div class="row">
+    @*<div class="row">
         <div class="col-md-6">
             <input type="text" size="80" name="datetimes" />
             <br />
@@ -54,7 +55,7 @@
         <div class="col-md-6">
             <br />
         </div>
-    </div>
+    </div>*@
 }
 
 <table id="products" class="table">
@@ -78,7 +79,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.OrderByDescending(a => a.OrderDate))
         {
             <tr>
 

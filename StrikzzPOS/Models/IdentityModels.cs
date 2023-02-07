@@ -39,6 +39,7 @@ namespace StrikzzPOS.Models
         public DbSet<PaymentTypes> PaymentTypes { get; set; }
         public DbSet<Order> Order { get; set; }
         public DbSet<OrderDetail> OrderDetail { get; set; }
+        public DbSet<UserProduct> UserProducts { get; set; }
 
     }
 }

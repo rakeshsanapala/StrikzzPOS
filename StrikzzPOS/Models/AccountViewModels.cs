@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using StrikzzPOS.DTO;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace StrikzzPOS.Models
 {
@@ -77,11 +79,16 @@ namespace StrikzzPOS.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
         [Required]
         public string Name { get; set; }
+
+        public List<ProductMstDTO> drpProducts { get; set; }
+
+        [Display(Name = "Products")]
+        public string ProductNames { get; set; }
     }
 
     public class ResetPasswordViewModel
@@ -99,10 +106,12 @@ namespace StrikzzPOS.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
         public string Code { get; set; }
+
+        public string userid { get; set; }
     }
 
     public class ForgotPasswordViewModel

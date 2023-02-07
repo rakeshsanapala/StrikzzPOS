@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
         public int OrderId { get; set; }
         public int FK_PaymentTypeId { get; set; }
         public int FK_CustomerId { get; set; }
+
         public string OrderNumber { get; set; }
         public DateTime? OrderDate { get; set; }
         public DateTime? OrderCancelDate { get; set; }

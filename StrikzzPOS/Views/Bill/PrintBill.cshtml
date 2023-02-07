@@ -1,0 +1,186 @@
+﻿@model StrikzzPOS.DTO.OrderDTO
+
+@{
+    ViewBag.Title = "PrintBill";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<style>
+    * {
+        font-size: 12px;
+        font-family: 'Times New Roman';
+    }
+
+    td,
+    th,
+    tr,
+    table {
+        border-top: 1px solid black;
+        border-collapse: collapse;
+    }
+
+        td.description,
+        th.description {
+            width: 75px;
+            max-width: 75px;
+        }
+
+        td.quantity,
+        th.quantity {
+            width: 40px;
+            max-width: 40px;
+            word-break: break-all;
+        }
+
+        td.price,
+        th.price {
+            width: 40px;
+            max-width: 40px;
+            word-break: break-all;
+        }
+
+    .centered {
+        text-align: center;
+        align-content: center;
+    }
+
+    .ticket {
+        width: 155px;
+        max-width: 155px;
+    }
+
+    img {
+        max-width: inherit;
+        width: inherit;
+    }
+
+    @@media print {
+        .hidden-print,
+        .hidden-print * {
+            display: none !important;
+        }
+    }
+</style>
+
+@*@using (Html.BeginForm("OrderDetail", "Order"))
+{
+    @Html.AntiForgeryToken()*@
+
+<div class="ticket">
+
+    <div style="text-align:center">
+        <h4>Receipt</h4>
+    </div>
+    <input type="hidden" value=@Model.OrderId id="OrderId" />
+    <div class="row">
+        <div class="col-md-6">
+            <strong>
+                #@Html.DisplayFor(a => a.OrderNumber)
+            </strong>
+        </div>
+        @*<div class="col-md-6">
+                @Html.DisplayFor(a => a.OrderDate)
+            </div>*@
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <strong>
+                Customer:
+            </strong>
+        </div>
+        <div class="col-md-6">
+            @Html.DisplayFor(a => a.CustomerName)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-condensed" id="tblOrderDetails">
+                <thead>
+                    <tr>
+                        <th>
+
+                        </th>
+                        <th>
+                            Price
+                        </th>
+                        <th>
+                            Qty
+                        </th>
+                        <th>
+                            Disc
+                        </th>
+                        <th>
+                            Total
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <tr>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UnitPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Quantity)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Discount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Total)
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <strong>
+                Final Total :
+            </strong>
+        </div>
+        <div class="col-md-6">
+            @Html.DisplayFor(a => a.FinalTotal)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <strong>
+                Paid by :
+            </strong>
+        </div>
+        <div class="col-md-6">
+            @ViewBag.OrderPaymentType
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            @Html.DisplayFor(a => a.OrderDate)
+        </div>
+    </div>
+</div>
+    <button id="btnPrint" class="hidden-print">Print</button>
+    @*<a href="StrikzzPOS/ComBill/SaveUpdateBill" class="pull-left">New Bill</a>*@
+    <script>
+
+/*        $(document).ready(function () {*/
+            const $btnPrint = document.querySelector("#btnPrint");
+            $btnPrint.addEventListener("click", () => {
+                window.print();
+            });
+/*        });*/
+        
+    </script>
+
+@*}*@
+

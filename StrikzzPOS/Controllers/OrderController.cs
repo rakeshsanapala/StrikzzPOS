@@ -94,7 +94,7 @@ namespace StrikzzPOS.Controllers
             order.FK_CustomerId = objOrder.FK_CustomerId;
             order.FinalTotal = objOrder.FinalTotal;
             order.OrderDate = DateTime.Now;
-            order.OrderNumber = String.Format("{0:ddMMyyyyhhmmss}", DateTime.Now);
+            order.OrderNumber = GetOrderNumber();
             order.FK_PaymentTypeId = objOrder.FK_PaymentTypeId;
             order.OrderStatus = "A";
             _db.Order.Add(order);
@@ -114,6 +114,25 @@ namespace StrikzzPOS.Controllers
                 _db.SaveChanges();
             }
             return Json("", JsonRequestBehavior.AllowGet);
+        }
+
+        protected string GetOrderNumber()
+        {
+            string numbers = "1234567890";
+            string characters = numbers;
+            int length = 6;
+            string id = string.Empty;
+            for (int i = 0; i < length; i++)
+            {
+                string character = string.Empty;
+                do
+                {
+                    int index = new Random().Next(0, characters.Length);
+                    character = characters.ToCharArray()[index].ToString();
+                } while (id.IndexOf(character) != -1);
+                id += character;
+            }
+            return "FF" + id;
         }
 
         public ActionResult OrderList()
