@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
     namespace StrikzzPOS.Common
     {
-    public class OrderDetail
+    [Table("OrderDetails")]
+    public class OrderDetails
     {
         [Key]
         public int OrderDetailId { get; set; }

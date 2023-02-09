@@ -4,8 +4,6 @@ using StrikzzPOS.DTO;
 using StrikzzPOS.Models;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -22,7 +20,7 @@ namespace StrikzzPOS.Controllers
         }
 
         [ChildActionOnly]
-      //  [OutputCache(CacheProfile = "Cache10Min")]
+        //  [OutputCache(CacheProfile = "Cache10Min")]
         public Com_Bill_DTO GetPageData()
         {
             Com_Bill_DTO comBill = new Com_Bill_DTO();
@@ -33,11 +31,11 @@ namespace StrikzzPOS.Controllers
             if (products != null)
             {
                 ProductList = (IEnumerable<ProductListDTO>)products;
-                if(!ProductList.Any())
+                if (!ProductList.Any())
                 {
                     ProductList = GetUserProducts();
                 }
-            }    
+            }
             else
             {
                 ProductList = GetUserProducts();
@@ -62,6 +60,7 @@ namespace StrikzzPOS.Controllers
 
         private IEnumerable<ProductListDTO> GetUserProducts()
         {
+            // TODO: Need to add these to Session
             IEnumerable<ProductListDTO> ProductList;
             var userid = User.Identity.GetUserId().ToString();
             ProductList = from a in _db.ProductMsts
@@ -81,18 +80,29 @@ namespace StrikzzPOS.Controllers
         [HttpGet]
         public JsonResult GetCustomerByPhone(string phoneNumber)
             {
-            CustomerMst customer = _db.CustomerMsts.Where(a => a.MobNo == phoneNumber).OrderByDescending(a=>a.LastVisit).FirstOrDefault();
+            CustomerMst customer = _db.CustomerMsts.Where(a => a.MobNo == phoneNumber).OrderByDescending(a => a.LastVisit).FirstOrDefault();
 
-           if (customer != null)
-            ViewBag.CustomerId = customer.pk_Custid;
-
+            if (customer != null)
+            {
+                ViewBag.CustomerId = customer.pk_Custid;
+            }
+                
             return Json(customer, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
         public JsonResult getItemUnitPrice(int itemId)
         {
-            ProductMst product = _db.ProductMsts.FirstOrDefault(a => a.pk_ProductId == itemId);
+            //TODO: Retried this on Application start
+            var products = Session["PRODUCTS"];
+            ProductMst product;
+            if (products!=null)
+            {
+                var productList = (IEnumerable<ProductMst>)products;
+                product =productList.FirstOrDefault(a => a.pk_ProductId == itemId);
+            }
+            else
+                product = _db.ProductMsts.FirstOrDefault(a => a.pk_ProductId == itemId);
             double UnitePrice = product.oriPrice;
 
             return Json(product, JsonRequestBehavior.AllowGet);
@@ -103,15 +113,6 @@ namespace StrikzzPOS.Controllers
         {
             Com_Bill_DTO item = new Com_Bill_DTO();
 
-            //CustomerMst cust;
-            //if (User.IsInRole("Admin"))
-            //{
-            //   cust = _db.CustomerMsts.FirstOrDefault(a => a.pk_Custid == id);
-            //}
-            //else
-            //{
-            //    cust = _db.CustomerMsts.FirstOrDefault(a => a.pk_Custid == id && a.Username == User.Identity.Name);
-            //}
             item = GetPageData();
             item.CustomerMst = new CustomerMst();
             return View(item);
@@ -148,35 +149,33 @@ namespace StrikzzPOS.Controllers
         }
 
         [HttpPost]
-        public JsonResult Order(Order objOrder)
+        public JsonResult Order(Orders objOrder)
         {
-            Order order = new Order();
-            if(objOrder.FK_CustomerId==0)
-            {
-
-            }
-            order.FK_CustomerId = objOrder.FK_CustomerId;
+            Orders order = new Orders();
+            order.FK_CustomerId = objOrder.FK_CustomerId == 0 ? AddCustomer(objOrder) : objOrder.FK_CustomerId;
             order.FinalTotal = objOrder.FinalTotal;
             order.OrderDate = DateTime.Now;
             order.OrderNumber = GetOrderNumber();
             order.FK_PaymentTypeId = objOrder.FK_PaymentTypeId;
             order.OrderStatus = "A";
-            _db.Order.Add(order);
+            _db.Orders.Add(order);
             _db.SaveChanges();
             int OrderId = order.OrderId;
 
             foreach (var objeOrderDetail in objOrder.OrderDetails)
             {
-                OrderDetail orderDetail = new OrderDetail();
+                OrderDetails orderDetail = new OrderDetails();
                 orderDetail.FK_OrderId = OrderId;
                 orderDetail.Discount = objeOrderDetail.Discount;
                 orderDetail.FK_ProductId = objeOrderDetail.FK_ProductId;
                 orderDetail.Total = objeOrderDetail.Total;
                 orderDetail.UnitPrice = objeOrderDetail.UnitPrice;
                 orderDetail.Quantity = objeOrderDetail.Quantity;
-                _db.OrderDetail.Add(orderDetail);
+                _db.OrderDetails.Add(orderDetail);
                 _db.SaveChanges();
             }
+
+            UpdateCustomer(order.FK_CustomerId,order);
             //return Json(new { response = "Redirect", url = Url.Action("OrderList", "Order") });
             return Json(new { response = "Redirect", url = Url.Action("PrintBill", "Bill", new { id = order.OrderId }) });
             // return Json(new { response = "Redirect", url = Url.Action("PrintBill", "Bill", new { orderId = order.OrderId, customerId = order.FK_CustomerId }) });
@@ -201,6 +200,34 @@ namespace StrikzzPOS.Controllers
             return "G" + id;
         }
 
+        private int AddCustomer(Orders order)
+        {
+            var customerMst = new CustomerMst();
+            customerMst.Name = order.CustomerName;
+            customerMst.MobNo = order.CustomerPhone;
+            customerMst.Username = User.Identity.Name;
+            customerMst.FirstVisit = DateTime.Now;
+            customerMst.LastVisit = DateTime.Now;
+            customerMst.TotalVisits = 0;
+            customerMst.TotalSpent = 0;
+            customerMst.PointBalance = 0;
+
+            _db.CustomerMsts.Add(customerMst);
+            _db.SaveChanges();
+
+            return customerMst.pk_Custid;
+        }
+
+        private void UpdateCustomer(int customerId, Orders order)
+        {
+            CustomerMst customerMst = _db.CustomerMsts.Where(a => a.pk_Custid == customerId).FirstOrDefault();
+            customerMst.LastVisit = DateTime.Now;
+            customerMst.TotalVisits = customerMst.TotalVisits+ 1;
+            customerMst.TotalSpent = customerMst.TotalSpent+ Convert.ToDecimal(order.FinalTotal);
+            customerMst.PointBalance = customerMst.PointBalance + Convert.ToInt64(order.FinalTotal);
+
+            _db.SaveChanges();
+        }
 
     }
 

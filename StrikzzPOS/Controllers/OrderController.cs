@@ -21,7 +21,7 @@ namespace StrikzzPOS.Controllers
         [HttpGet]
         public ActionResult OrderDetails(int id)
         {
-            var ord= from o in _db.Order
+            var ord= from o in _db.Orders
                        join c in _db.CustomerMsts on o.FK_CustomerId equals c.pk_Custid
                        join p in _db.PaymentTypes on o.FK_PaymentTypeId equals p.pk_PaymentTypeId where o.OrderId== id
                        select new { OrderId = o.OrderId,
@@ -47,7 +47,7 @@ namespace StrikzzPOS.Controllers
                 FinalTotal = dbOrder.FinalTotal
             };
 
-            var orderDetails = from od in _db.OrderDetail.Where(a => a.FK_OrderId == order.OrderId)
+            var orderDetails = from od in _db.OrderDetails.Where(a => a.FK_OrderId == order.OrderId)
                                join pr in _db.ProductMsts on od.FK_ProductId equals pr.pk_ProductId
                                select new
                                {
@@ -88,29 +88,29 @@ namespace StrikzzPOS.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateOrder(Order objOrder)
+        public ActionResult CreateOrder(Orders objOrder)
         {
-            Order order = new Order();
+            Orders order = new Orders();
             order.FK_CustomerId = objOrder.FK_CustomerId;
             order.FinalTotal = objOrder.FinalTotal;
             order.OrderDate = DateTime.Now;
             order.OrderNumber = GetOrderNumber();
             order.FK_PaymentTypeId = objOrder.FK_PaymentTypeId;
             order.OrderStatus = "A";
-            _db.Order.Add(order);
+            _db.Orders.Add(order);
             _db.SaveChanges();
             int OrderId = order.OrderId;
 
             foreach (var objeOrderDetail in objOrder.OrderDetails)
             {
-                OrderDetail orderDetail = new OrderDetail();
+                OrderDetails orderDetail = new OrderDetails();
                 orderDetail.FK_OrderId = OrderId;
                 orderDetail.Discount = objeOrderDetail.Discount;
                 orderDetail.FK_ProductId = objeOrderDetail.FK_ProductId;
                 orderDetail.Total = objeOrderDetail.Total;
                 orderDetail.UnitPrice = objeOrderDetail.UnitPrice;
                 orderDetail.Quantity = objeOrderDetail.Quantity;
-                _db.OrderDetail.Add(orderDetail);
+                _db.OrderDetails.Add(orderDetail);
                 _db.SaveChanges();
             }
             return Json("", JsonRequestBehavior.AllowGet);
@@ -138,7 +138,7 @@ namespace StrikzzPOS.Controllers
         public ActionResult OrderList()
         {
             var orders = new List<OrderDTO>();
-            var orderList = from o in _db.Order
+            var orderList = from o in _db.Orders
                             join c in _db.CustomerMsts on o.FK_CustomerId equals c.pk_Custid
                             select new { OrderId=o.OrderId,OrderNumber = o.OrderNumber, OrderDate = o.OrderDate, OrderStatus = o.OrderStatus, CustomerName = c.Name, FinalTotal = o.FinalTotal };
             foreach (var o in orderList)
@@ -160,9 +160,9 @@ namespace StrikzzPOS.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult CancelOrder(Order ord)
+        public ActionResult CancelOrder(Orders ord)
         {
-            var order = _db.Order.FirstOrDefault(a => a.OrderId == ord.OrderId);
+            var order = _db.Orders.FirstOrDefault(a => a.OrderId == ord.OrderId);
             order.OrderStatus = "C";
             order.OrderCancelDate = DateTime.Now;
             _db.SaveChanges();

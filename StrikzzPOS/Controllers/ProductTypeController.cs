@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace StrikzzPOS.Controllers
 {
-    [Authorize(Roles = "Admin")]
+  //  [Authorize(Roles = "Admin")]
     public class ProductTypeController : Controller
     {
         ApplicationDbContext _db;

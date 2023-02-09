@@ -146,7 +146,7 @@
             dataType: 'JSON',
             contentType: 'application/json; charset=utf-8',
             data: { itemId: itemId },
-            url: '/StrikzzPOS/ComBill/getItemUnitPrice',
+            url: '@Url.Action("getItemUnitPrice", "ComBill")',
             success: function (data) {
                 $("#txtUnitPrice").val(parseFloat(data["sellingUpToPrice"]).toFixed(2));
                 $("#selectedProductName").val(data["ProductName"]);
@@ -168,11 +168,10 @@
             dataType: 'JSON',
             contentType: 'application/json; charset=utf-8',
             data: { phoneNumber: phoneNumber },
-            url: '/StrikzzPOS/ComBill/GetCustomerByPhone',
+            url: '@Url.Action("GetCustomerByPhone", "ComBill")',
             success: function (data) {
                 $("#txtName").val(data["Name"]);
                 $("#hiddenCustomerId").val(data["pk_Custid"]);
-                
 
             },
             //error: function () {
@@ -231,6 +230,8 @@
         var ListOfOrderDetailsModel = new Array();
         objOrderViewModel.FK_PaymentTypeId = $("#Fk_PaymentTypeId").val();
         objOrderViewModel.FK_CustomerId = $("#hiddenCustomerId").val();
+        objOrderViewModel.CustomerName = $("#txtName").val();
+        objOrderViewModel.CustomerPhone = $("#txtPhone").val();
         objOrderViewModel.FinalTotal = $("#txtPaymentTotal").val();
 
         $("tr:gt(1)").each(function () {
@@ -255,7 +256,7 @@
             async: true,
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(objOrderViewModel),
-            url: '/StrikzzPOS/ComBill/Order',
+            url: '@Url.Action("Order","ComBill")',
             success: function (response) {
                 debugger;
                 window.location = response.url;

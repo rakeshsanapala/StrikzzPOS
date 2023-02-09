@@ -27,7 +27,7 @@ namespace StrikzzPOS.Controllers
         [HttpGet]
         public ActionResult PrintBill(int id)
         {
-            var ord = from o in _db.Order
+            var ord = from o in _db.Orders
                       join c in _db.CustomerMsts on o.FK_CustomerId equals c.pk_Custid
                       join p in _db.PaymentTypes on o.FK_PaymentTypeId equals p.pk_PaymentTypeId
                       where o.OrderId == id
@@ -56,7 +56,7 @@ namespace StrikzzPOS.Controllers
                 FinalTotal = dbOrder.FinalTotal
             };
 
-            var orderDetails = from od in _db.OrderDetail.Where(a => a.FK_OrderId == order.OrderId)
+            var orderDetails = from od in _db.OrderDetails.Where(a => a.FK_OrderId == order.OrderId)
                                join pr in _db.ProductMsts on od.FK_ProductId equals pr.pk_ProductId
                                select new
                                {
@@ -98,10 +98,10 @@ namespace StrikzzPOS.Controllers
             ViewBag.CurrentDate = DateTime.Now.ToString("MM/dd/yyyy HH:mm");
             ViewBag.CustomerData = customer;
             // ViewBag.Setting = _settingService.List().FirstOrDefault();
-            var order = _db.Order.FirstOrDefault(a => a.OrderId == orderId);
+            var order = _db.Orders.FirstOrDefault(a => a.OrderId == orderId);
             ViewBag.BillNo = orderId;
             ViewBag.Order = order;
-            IEnumerable<OrderDetail> orderDetails = _db.OrderDetail.Where(a => a.FK_OrderId == orderId).ToList();
+            IEnumerable<OrderDetails> orderDetails = _db.OrderDetails.Where(a => a.FK_OrderId == orderId).ToList();
 
             return View(orderDetails);
         }

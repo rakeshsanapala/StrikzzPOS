@@ -93,6 +93,7 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -165,13 +166,15 @@
     <Compile Include="Common\CustomerMst.cs" />
     <Compile Include="Common\CustomRoles.cs" />
     <Compile Include="Common\ModuleMst.cs" />
-    <Compile Include="Common\Order.cs" />
-    <Compile Include="Common\OrderDetail.cs" />
+    <Compile Include="Common\Orders.cs" />
+    <Compile Include="Common\OrderDetails.cs" />
     <Compile Include="Common\PaymentTypes.cs" />
     <Compile Include="Common\ProductListForBill.cs" />
     <Compile Include="Common\ProductMst.cs" />
     <Compile Include="Common\ProductTypeMst.cs" />
+    <Compile Include="Common\UserProduct.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BillController.cs" />
     <Compile Include="Controllers\ComBillController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
@@ -210,6 +213,10 @@
     <Compile Include="Migrations\201910050353481_AddProductListForBill.Designer.cs" />
     <Compile Include="Migrations\201910050404569_ChangeInProductListForBill_CangeUserdataType.cs" />
     <Compile Include="Migrations\201910050404569_ChangeInProductListForBill_CangeUserdataType.Designer.cs" />
+    <Compile Include="Migrations\202302070747487_EmptyMigration.cs" />
+    <Compile Include="Migrations\202302070747487_EmptyMigration.Designer.cs">
+      <DependentUpon>202302070747487_EmptyMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -660,6 +667,9 @@
     <EmbeddedResource Include="Migrations\201901051540548_addCustomer.resx" />
     <EmbeddedResource Include="Migrations\201910050353481_AddProductListForBill.resx" />
     <EmbeddedResource Include="Migrations\201910050404569_ChangeInProductListForBill_CangeUserdataType.resx" />
+    <EmbeddedResource Include="Migrations\202302070747487_EmptyMigration.resx">
+      <DependentUpon>202302070747487_EmptyMigration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
